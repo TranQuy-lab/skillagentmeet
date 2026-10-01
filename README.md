@@ -25,6 +25,12 @@
 │   ├── __init__.py
 │   ├── client.py              # Class AgentMeet: join, send, read, leave, status, transcript
 │   └── protocol.py            # Codec Envelope JSON chuẩn hoá & State folding
+├── admin/                     # Bộ công cụ Quản trị & Điều phối phòng họp (Admin Console & CLI)
+│   ├── SKILL.md               # Hướng dẫn vai trò Admin Agent & bảng lệnh
+│   ├── admin_cli.py           # CLI điều hành phòng (status, agents, assign, review, directive, order-rest)
+│   ├── main.py                # Giao diện đồ họa PyQt5 Admin Console
+│   ├── requirements.txt       # Phụ thuộc bổ sung cho GUI (PyQt5, requests)
+│   └── agentmeet/             # Gói client & UI phục vụ Admin Console
 ├── scripts/                   # Các script công cụ thực thi dòng lệnh
 │   ├── inbox.py               # Đọc và lọc tin nhắn bảo tồn context (cursor tracking, --compact, --mention)
 │   ├── read_since.py          # Wrapper tương thích đọc tin nhắn tăng dần
@@ -91,3 +97,26 @@ Khi có tin nhắn mới mang `message_id > 10`, tiến trình in nội dung ra 
    - Endpoint `GET /api/v1/{room}/read?token={agent_token}` tự động đánh dấu đã đọc. Cần lưu lại tin nhắn nếu muốn sử dụng lại nhiều lần trong ngữ cảnh.
 5. **Context-Safe Incremental Reading (`scripts/inbox.py`)**:
    - Lưu trữ con trỏ đọc (`cursor state`) cục bộ tại `~/.agentmeet/inbox_cursor_{room}.json`. Mỗi lần gọi chỉ fetch phần tin mới (`delta`), định dạng compact 1 dòng (`--compact`) hoặc tóm tắt (`--summary`), ngăn chặn triệt để nguy cơ tràn context window.
+
+---
+
+## 5. Phân Cấp Chỉ Huy & Admin Console (`admin/`)
+
+Hệ thống hỗ trợ phân cấp quản trị rõ ràng giữa **Người dùng**, **Admin Agent** và **Worker Agents**:
+1. **Phân quyền từ Người dùng:** Người dùng chỉ định Agent nào làm Admin và giao lệnh cho Admin đó.
+2. **Kỷ luật phục tùng tuyệt đối:** Mọi Agent thành viên trong phòng họp bắt buộc phải tuân theo sự điều phối, phân công (`assign`), giới hạn file (`territory`) và duyệt nghiệm thu (`review`) từ Admin.
+3. **Lệnh nghỉ ngơi:** Worker Agents duy trì vòng poll và chỉ dừng lại khi Admin ban hành chỉ thị nghỉ (`admin_cli.py order-rest`).
+
+```bash
+# Xem phòng & Gia nhập làm Admin
+python3 admin/admin_cli.py --room <ROOM_ID> status
+python3 admin/admin_cli.py --room <ROOM_ID> join --name "Admin"
+
+# Giao nhiệm vụ & Ban hành chỉ thị
+python3 admin/admin_cli.py --room <ROOM_ID> assign --to "<Tên Agent>" --task "T1" --title "<Tên Task>" --territory "<files>"
+python3 admin/admin_cli.py --room <ROOM_ID> directive --title "<Tiêu đề>" --content "<Nội dung>"
+
+# Nghiệm thu & Ban hành lệnh nghỉ ngơi
+python3 admin/admin_cli.py --room <ROOM_ID> review --task "T1" --decision approve --feedback "Đạt tiêu chuẩn"
+python3 admin/admin_cli.py --room <ROOM_ID> order-rest --message "Toàn bộ nhiệm vụ đã hoàn thành."
+```

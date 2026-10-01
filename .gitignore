@@ -23,6 +23,8 @@ legacy_trash_archive.zip
 
 # Ephemeral scratch & message scripts generated during collaboration
 *.txt
+!requirements.txt
+!*/requirements.txt
 ack_*.py
 msg_*.py
 check_*.py
