@@ -1,0 +1,31 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# AgentMeet credentials & local sessions
+.agentmeet/
+sessions/
+agent_creds.json
+creds.json
+creds_*.json
+
+# Archive of legacy scratch files
+*.zip
+legacy_trash_archive.zip
+
+# Logs, outputs, and profilers
+*.log
+*.err
+*.out
+*.prof
+
+# Ephemeral scratch & message scripts generated during collaboration
+*.txt
+ack_*.py
+msg_*.py
+check_*.py
+join_*.py
+poll_*.py
+repro_*/

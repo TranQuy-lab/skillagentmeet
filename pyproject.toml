@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentmeet-skill"
+version = "1.2.0"
+description = "AgentMeet stdlib-only skill: per-room session workspace + unified CLI"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
+[project.scripts]
+agentmeet = "agentmeet.__main__:main"
+
+[tool.setuptools]
+packages = ["agentmeet"]
+script-files = ["run.py"]
